@@ -41,14 +41,17 @@ Lastly, using `combine_complexity_measures_syn.py` we will obtain the dataset ch
 
 ### Complexity dataset analysis
 
-We are using `analysis_diff_df_syn.ipynb` to analyze the complexity differences between privileged and unprivileged groups.
+We are using `analysis_complexity_diff_synthetic.ipynb` to analyze the complexity differences between privileged and unprivileged groups.
 The dataset of the differences is saved in `results/df_complexity_measures_sync_diff.csv`
 Here we are plotting:
-- Figure 1
-- Figure 2
-- Figure 3
-- Figure 4
+- Figure 1: Distribution of absolute differences in various complexity metrics when comparing privileged and
+unprivileged groups.
+- Figure 2: Distribution of complexity metrics absolute differences by each bias scenario.
+- Figure 4: Distribution of complexity metric values across bias scenarios. 
+- Figure 5: Two-dimensional MDS visualization of synthetic datasets complexity metrics absolute differences
+colored by bias scenario.
 
+We used the `results/df_complexity_measures_sync_diff.csv` dataframe for the Figure 3: Evolution of complexity metrics difference by bias parameter (`plot_complexity_diff_evolution_scenario.py`) 
 
 ## Fairness dataset
 
@@ -57,15 +60,22 @@ Then we combine all the result obtaining a file for each method using `combine_f
 
 ### Fairness dataset analysis
 
-We are using `analysis_diff_df_syn.ipynb` to analyze the fairness measures we computed for each dataset.
+We are using `analysis_fairness_diff_synthetic.ipynb` to analyze the fairness measures we computed for each dataset.
 We use the previous files to obtain the fairness measures combined in one table (file: `results/df_fairness_measures_sync.csv`) 
 
 Here we are plotting:
-- Figure 5
-- Figure 6
+- Figure 6: Distribution of fairness metrics result.
+- Figure 7: Parallel coordinates visualization of fairness metrics across different bias scenarios.
+- Figure 9: MDS visualization of synthetic and real-world datasets. 
 
 We also load the complexity dataframe and merge with the fairness dataframe to make a visualization using MDS of the dataset colored by fairness results (Figure 7)
 Lastly, we load the real-world data to make a combined visualization of the synthetic and rel-world datasets.
+
+# Association rules
+
+We are using `analysis_fairness&complexity_diff_synthetic.ipynb` to compute the association rules relating complexity differences and fairness metrics.
+
+- Figure 8: Association rules. 
 
 # Real-world problems application
 
@@ -75,7 +85,7 @@ The same procedure of the synthetic datasets was followed to characterize the re
 
 ## Analysis of real-world datasets
 
-We are using `analysis_diff_df_syn.ipynb` to analyze how the rules obtained using synthetic data apply to real-world data.
+We are using `analysis_fairness&complexity_diff.ipynb` to analyze how the rules obtained using synthetic data apply to real-world data.
 
 
 

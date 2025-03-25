@@ -28,10 +28,9 @@ def prepare_data(complexity_df):
     return complexity_df
 
 
-def plot_complexity_by_scenario(df, metrics, output_filename=None):
+def plot_complexity_by_scenario_old(df, metrics, output_filename=None):
     """Create plots organized by scenario with all metrics and improved legend"""
-    # Define scenarios and their styles
-
+    # Define scenarios and their style
     scenario_styles = {
         'S1A': {'color': '#d62728', 'label': 'Scenario S1A: No Bias'},
         'S1B': {'color': '#bcbd22', 'label': 'Scenario S1B: Measurement Bias on R'},
@@ -98,7 +97,7 @@ def plot_complexity_by_scenario(df, metrics, output_filename=None):
         if idx == 0:
             handles, labels = ax.get_legend_handles_labels()
 
-    # Create legend with more columns and place it at the top
+    # Fit legend to the top, add more columns
     fig.legend(handles, labels,
                loc='upper center',
                bbox_to_anchor=(0.5, 0.98),
@@ -120,10 +119,110 @@ def plot_complexity_by_scenario(df, metrics, output_filename=None):
     plt.show()
 
 
+def plot_complexity_by_scenario(df, metrics, output_filename=None):
+    """Create line plots organized by scenario with all metrics"""
+
+    # Define scenarios and their styles
+    scenario_styles = {
+        'S1A': {'color': '#d62728', 'label': 'Scenario S1A: No Bias'},
+        'S1B': {'color': '#bcbd22', 'label': 'Scenario S1B: Measurement Bias on R'},
+        'S1C': {'color': '#2ca02c', 'label': 'Scenario S1C: R Omitted'},
+        'S1D': {'color': '#1f77b4', 'label': 'Scenario S1D: Undersampling'},
+        'S1E': {'color': '#9467bd', 'label': 'Scenario S1E: Measurement Bias on Y'},
+        'S1F': {'color': '#8c564b', 'label': 'Scenario S1F: Conditional undersampling on R'},
+        'S2A': {'color': '#e377c2', 'label': 'Scenario S2A: Historical Bias on R'},
+        'S3A': {'color': '#ff7f0e', 'label': 'Scenario S3A: Historical Bias on Y'},
+        'S4A': {'color': '#7f7f7f', 'label': 'Scenario S4A: Historical Bias on Q'}
+    }
+
+    # Define line styles for metrics
+    line_styles = ['-', '--', ':', '-.', (0, (3, 1, 1, 1)), (0, (5, 1))]
+    markers = ['o', 's', '^', 'v', 'D', 'p', 'h', '8', '*']
+
+    # Create subplots for each scenario
+    n_scenarios = len(scenario_styles)
+    n_cols = 3
+    n_rows = (n_scenarios + n_cols - 1) // n_cols
+
+    # Create figure
+    fig, axes = plt.subplots(n_rows, n_cols, figsize=(20, 6 * n_rows))
+    fig.subplots_adjust(top=0.85, hspace=0.4)  # Increase hspace to prevent overlap
+
+    # Font scaling
+    fig_width, fig_height = fig.get_size_inches()
+    base_fontsize = 10
+    scale_factor = (fig_width + fig_height) / 2
+    fontsize = base_fontsize * (scale_factor / 10)  # Scale proportionally
+
+    axes = axes.flatten()  # Flatten in case of a grid
+
+    # Create a plot for each scenario
+    for idx, (scenario_full, style) in enumerate(scenario_styles.items()):
+        ax = axes[idx]
+
+        # Set y-axis limits
+        ax.set_ylim(-0.1, 0.7)
+
+        # Get data for this scenario
+        scenario_data = df[df['scenario_full'] == scenario_full].sort_values('param_value')
+
+        if not scenario_data.empty:
+            # Plot each metric
+            for metric_idx, metric in enumerate(metrics):
+                line_style = line_styles[metric_idx % len(line_styles)]
+                marker = markers[metric_idx % len(markers)]
+
+                ax.plot(scenario_data['param_value'],
+                        scenario_data[metric],
+                        label=metric,
+                        linestyle=line_style,
+                        marker=marker,
+                        markersize=7,
+                        linewidth=2,
+                        alpha=0.7)
+
+        # Titles
+        ax.set_title(f'{style["label"]}', fontsize=fontsize + 2, pad=15)  # Added extra padding
+        ax.set_xlabel('Parameter Index', fontsize=fontsize, labelpad=12)  # More space for x-label
+        ax.set_ylabel('Metric Difference', fontsize=fontsize)
+        ax.grid(True, alpha=0.2)
+        ax.tick_params(axis='both', which='major', labelsize=fontsize)
+
+        # Capture legend handles from the first plot
+        if idx == 0:
+            handles, labels = ax.get_legend_handles_labels()
+
+    # Remove empty subplots (if any)
+    for idx in range(len(scenario_styles), len(axes)):
+        fig.delaxes(axes[idx])
+
+    # Add legend at the top - scaled font size
+    fig.legend(handles, labels,
+               loc='upper center',
+               bbox_to_anchor=(0.5, 0.98),
+               ncol=10,
+               fontsize=fontsize,
+               borderaxespad=0,
+               framealpha=0.9,
+               edgecolor='black',
+               columnspacing=1.0,
+               handletextpad=0.5,
+               bbox_transform=plt.gcf().transFigure)
+
+    # Layout
+    plt.tight_layout(rect=[0, 0, 1, 0.85], pad=3.0)  # Added padding
+
+    # Save the figure if filename is provided
+    if output_filename:
+        plt.savefig(output_filename, bbox_inches='tight', dpi=300)
+
+    plt.show()
+
+
 def main():
     # Read the datasets
     complexity_df = pd.read_csv('results/df_complexity_measures_sync_diff.csv', index_col='complete_name') #complexity_df_complete_syn
-    complexity_df.drop(columns=['base_experiment'], inplace=True)
+    # complexity_df.drop(columns=['base_experiment'], inplace=True)
 
     # Prepare data
     df = prepare_data(complexity_df)
